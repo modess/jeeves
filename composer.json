@@ -1,0 +1,11 @@
+{
+    "name": "modess/jeeves",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Niklas Modess",
+            "email": "niklas@modess.io"
+        }
+    ],
+    "require": {}
+}
