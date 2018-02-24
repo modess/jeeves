@@ -17,6 +17,16 @@ class Jeeves
     private $buildDirectory;
 
     /**
+     * @var string
+     */
+    private $sourceDirectory;
+
+    /**
+     * @var string
+     */
+    private $testsDirectory;
+
+    /**
      * Jeeves constructor.
      *
      * @param Filesystem $filesystem
@@ -29,7 +39,7 @@ class Jeeves
     /**
      * @return bool
      */
-    public function jenkinsFileExists()
+    public function jenkinsFileExists(): bool
     {
         return $this->filesystem->exists(__DIR__ . '/../Jenkinsfile');
     }
@@ -48,5 +58,37 @@ class Jeeves
     public function setBuildDirectory(string $buildDirectory)
     {
         $this->buildDirectory = $buildDirectory;
+    }
+
+    /**
+     * @return string
+     */
+    public function getSourceDirectory(): string
+    {
+        return $this->sourceDirectory;
+    }
+
+    /**
+     * @param string $sourceDirectory
+     */
+    public function setSourceDirectory(string $sourceDirectory)
+    {
+        $this->sourceDirectory = $sourceDirectory;
+    }
+
+    /**
+     * @return string
+     */
+    public function getTestsDirectory(): string
+    {
+        return $this->testsDirectory;
+    }
+
+    /**
+     * @param string $testsDirectory
+     */
+    public function setTestsDirectory(string $testsDirectory)
+    {
+        $this->testsDirectory = $testsDirectory;
     }
 }

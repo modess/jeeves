@@ -4,6 +4,7 @@ namespace Jeeves\Commands;
 
 use Jeeves\Jeeves;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -26,8 +27,10 @@ class GenerateCommand extends Command
 
     protected function configure()
     {
-        $this->addOption('force', InputOption::VALUE_NONE, null, 'Force Jenkinsfile generation');
-        $this->addOption('build-dir', InputOption::VALUE_OPTIONAL, null, 'Build directory to use');
+        $this->addOption('force', null, InputOption::VALUE_NONE, 'Force Jenkinsfile generation');
+        $this->addOption('build-dir', null, InputOption::VALUE_OPTIONAL, 'Build directory to use');
+        $this->addOption('source-dir', null, InputOption::VALUE_OPTIONAL, 'Source directory');
+        $this->addOption('tests-dir', null, InputOption::VALUE_OPTIONAL, 'Tests directory');
     }
 
     protected function interact(InputInterface $input, OutputInterface $output)
@@ -44,14 +47,71 @@ class GenerateCommand extends Command
             }
         }
 
-        if (!$input->getOption('build-dir')) {
-            $buildDirectory = $helper->ask($input, $output, new Question(
-                'What build directory do want to use? [build] ',
-                'build'
-            ));
+        $this->setValueFromInput(
+            $input,
+            $output,
+            $helper,
+            'build-dir',
+            'What build directory do want to use?',
+            'build',
+            function ($value) {
+                $this->jeeves->setBuildDirectory($value);
+            }
+        );
 
-            $this->jeeves->setBuildDirectory($buildDirectory);
+        $this->setValueFromInput(
+            $input,
+            $output,
+            $helper,
+            'source-dir',
+            'Where is the source located in your application?',
+            'src',
+            function ($value) {
+                $this->jeeves->setSourceDirectory($value);
+            }
+        );
+
+        $this->setValueFromInput(
+            $input,
+            $output,
+            $helper,
+            'tests-dir',
+            'Where are the tests located in your application?',
+            'tests',
+            function ($value) {
+                $this->jeeves->setTestsDirectory($value);
+            }
+        );
+    }
+
+    /**
+     * @param InputInterface  $input
+     * @param OutputInterface $output
+     * @param QuestionHelper  $questionHelper
+     * @param string          $option
+     * @param string          $question
+     * @param string          $default
+     * @param \Closure        $closure
+     */
+    public function setValueFromInput(
+        InputInterface $input,
+        OutputInterface $output,
+        QuestionHelper $questionHelper,
+        string $option,
+        string $question,
+        string $default,
+        \Closure $closure
+    ) {
+        $option = $input->getOption($option);
+
+        if (!$option) {
+            $option = $questionHelper->ask($input, $output, new Question(
+                $question . ' [' . $default . '] ',
+                $default
+            ));
         }
+
+        $closure($option);
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
