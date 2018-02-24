@@ -7,6 +7,6 @@ use Symfony\Component\Console\Application;
 
 $application = new Application();
 
-$application->add(new \Jeeves\GenerateCommand());
+$application->add(new \Jeeves\Commands\GenerateCommand());
 
 $application->run();
