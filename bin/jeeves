@@ -7,6 +7,8 @@ use Symfony\Component\Console\Application;
 
 $application = new Application();
 
-$application->add(new \Jeeves\Commands\GenerateCommand());
+$jeeves = new \Jeeves\Jeeves(new \Symfony\Component\Filesystem\Filesystem());
+
+$application->add(new \Jeeves\Commands\GenerateCommand($jeeves));
 
 $application->run();
