@@ -20,7 +20,7 @@
     "suggest": {
         "phpunit/phpunit": "Run unit tests and generate code coverage",
         "squizlabs/php_codesniffer": "Checking that code styles follows a standard",
-        "phpmd/phpmd": "^2.6",
+        "phpmd/phpmd": "Check code complexity",
         "sebastian/phpcpd": "Check for code duplication",
         "jakub-onderka/php-parallel-lint": "Fast PHP linting in parallel"
     }
