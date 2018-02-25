@@ -1,0 +1,92 @@
+pipeline {
+  agent any
+
+  environment {
+    PATH = "vendor/bin:/var/lib/jenkins/.composer/vendor/bin:$PATH"
+  }
+
+  stages {
+    {{slack}}
+    stage('announce') {
+      steps {
+        slackSend channel: '#{{slackChannel}',
+                  message: "Build started: ${currentBuild.fullDisplayName} (<${env.RUN_DISPLAY_URL}|Open>)"
+      }
+    } // stage announce
+    {{/slack}}
+
+    stage('lint') {
+      steps {
+        sh 'parallel-lint -s {{sourceDirectory}}'
+      }
+    } // stage lint
+
+    stage('prepare') {
+      steps {
+        sh 'mkdir -p {{buildDirectory}}/{logs,coverage} || true'
+        sh "composer install"
+      }
+    } // stage prepare
+
+    stage('test') {
+      steps {
+        sh "phpunit -c phpunit.xml.dist --coverage-html {{buildDirectory}}/coverage --coverage-clover {{buildDirectory}}/logs/clover.xml --coverage-crap4j {{buildDirectory}}/logs/crap4j.xml --log-junit {{buildDirectory}}/logs/junit.xml"
+      }
+
+      post {
+        success {
+          junit '{{buildDirectory}}/logs/junit.xml'
+          publishHTML(allowMissing: false, alwaysLinkToLastBuild: false, keepAll: true, reportDir: '{{buildDirectory}}/coverage', reportFiles: 'index.html', reportName: 'Code coverage', reportTitles: 'Code Coverage')
+        }
+      }
+    } // stage test
+
+    stage('analysis') {
+      steps {
+        parallel (
+          phpmd: {
+            sh 'phpmd {{sourceDirectory}} xml {{buildDirectory}}/phpmd.xml --reportfile {{buildDirectory}}/logs/pmd.xml --suffixes php --ignore-violations-on-exit'
+          },
+          phpcs: {
+            sh 'phpcs --report=checkstyle --report-file={{buildDirectory}}/logs/phpcs-checkstyle.xml --standard=phpcs.xml --extensions=php --runtime-set ignore_errors_on_exit 1 --runtime-set ignore_warnings_on_exit 1 {{sourceDirectory}}'
+          },
+          phpcpd: {
+            sh 'phpcpd --log-pmd {{buildDirectory}}/logs/pmd-cpd.xml {{sourceDirectory}} || true'
+          }
+        )
+      }
+
+      post {
+        success {
+          pmd canComputeNew: false, defaultEncoding: '', healthy: '70', pattern: '{{buildDirectory}}/logs/pmd.xml', unHealthy: '999'
+          checkstyle canComputeNew: false, defaultEncoding: '', healthy: '100', pattern: '{{buildDirectory}}/logs/phpcs-checkstyle.xml', unHealthy: '999'
+          dry canComputeNew: false, defaultEncoding: '', healthy: '', pattern: '{{buildDirectory}}/logs/pmd-cpd.xml', unHealthy: ''
+        }
+      }
+    } // stage analysis
+  }
+
+  {{slack}}
+  post {
+    success {
+      slackSend channel: '#{{slackChannel}',
+                color: 'good',
+                message: "${currentBuild.fullDisplayName} completed successfully after ${currentBuild.durationString}. (<${env.RUN_DISPLAY_URL}|Open>)"
+    }
+    failure {
+      slackSend channel: '#{{slackChannel}',
+                color: 'danger',
+                message: "@channel ${currentBuild.fullDisplayName} failed after ${currentBuild.durationString}. (<${env.RUN_DISPLAY_URL}|Open>)"
+    }
+    unstable {
+      slackSend channel: '#{{slackChannel}',
+                color: 'warning',
+                message: "${currentBuild.fullDisplayName} passed after ${currentBuild.durationString}, but is unstable. (<${env.RUN_DISPLAY_URL}|Open>)"
+    }
+    aborted {
+      slackSend channel: '#{{slackChannel}',
+                message: "Build aborted: ${currentBuild.fullDisplayName} (<${env.RUN_DISPLAY_URL}|Open>)"
+    }
+  }
+  {{/slack}}
+}
