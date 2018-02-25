@@ -115,7 +115,7 @@ class Jeeves
         if (empty($this->getSlackChannel())) {
             $stub = preg_replace('/(\{\{slack\}\}(.|\n)*\{\{\/slack\}\})/mU', '', $stub);
         } else {
-            $stub = str_replace('{{slack\}}', '', $stub);
+            $stub = str_replace('{{slack}}', '', $stub);
             $stub = str_replace('{{/slack}}', '', $stub);
             $stub = str_replace('{{slackChannel}}', $this->getSlackChannel(), $stub);
         }
