@@ -7,7 +7,10 @@ use Symfony\Component\Console\Application;
 
 $application = new Application();
 
-$jeeves = new \Jeeves\Jeeves(new \Symfony\Component\Filesystem\Filesystem());
+$reflection = new \ReflectionClass(\Composer\Autoload\ClassLoader::class);
+$rootDirectory = dirname(dirname(dirname($reflection->getFileName())));
+
+$jeeves = new \Jeeves\Jeeves(new \Symfony\Component\Filesystem\Filesystem(), $rootDirectory);
 
 $application->add(new \Jeeves\Commands\GenerateCommand($jeeves));
 

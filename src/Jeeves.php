@@ -14,6 +14,11 @@ class Jeeves
     /**
      * @var string
      */
+    private $rootDirectory;
+
+    /**
+     * @var string
+     */
     private $buildDirectory;
 
     /**
@@ -24,16 +29,17 @@ class Jeeves
     /**
      * @var string
      */
-    private $testsDirectory;
+    private $slackChannel;
 
     /**
      * Jeeves constructor.
      *
      * @param Filesystem $filesystem
      */
-    public function __construct(Filesystem $filesystem)
+    public function __construct(Filesystem $filesystem, string $rootDirectory)
     {
         $this->filesystem = $filesystem;
+        $this->rootDirectory = $rootDirectory;
     }
 
     /**
@@ -41,7 +47,7 @@ class Jeeves
      */
     public function jenkinsFileExists(): bool
     {
-        return $this->filesystem->exists(__DIR__ . '/../Jenkinsfile');
+        return $this->filesystem->exists($this->rootDirectory . '/Jenkinsfile');
     }
 
     /**
@@ -79,16 +85,41 @@ class Jeeves
     /**
      * @return string
      */
-    public function getTestsDirectory(): string
+    public function getSlackChannel(): string
     {
-        return $this->testsDirectory;
+        return $this->slackChannel;
     }
 
     /**
-     * @param string $testsDirectory
+     * @param string $slackChannel
      */
-    public function setTestsDirectory(string $testsDirectory)
+    public function setSlackChannel(string $slackChannel)
     {
-        $this->testsDirectory = $testsDirectory;
+        if (!empty($slackChannel) && !strstr($slackChannel, '#')) {
+            $slackChannel = '#' . $slackChannel;
+        }
+
+        $this->slackChannel = $slackChannel;
+    }
+
+    /**
+     * Generate Jenkinsfile
+     */
+    public function generateJenkinsFile()
+    {
+        $stub = file_get_contents(__DIR__ . '/stubs/Jenkinsfile');
+
+        if (empty($this->getSlackChannel())) {
+            $stub = preg_replace('/(\{\{slack\}\}(.|\n)*\{\{\/slack\}\})/mU', '', $stub);
+        } else {
+            $stub = preg_replace('/(\{\{slack\}\})/', '', $stub);
+            $stub = preg_replace('/(\{\{\/slack\}\})/', '', $stub);
+            $stub = preg_replace('/(\{\{slackChannel\}\})/', $this->getSlackChannel(), $stub);
+        }
+
+        $stub = preg_replace('/(\{\{buildDirectory\}\})/', $this->getBuildDirectory(), $stub);
+        $stub = preg_replace('/(\{\{sourceDirectory\}\})/', $this->getSourceDirectory(), $stub);
+
+        $this->filesystem->dumpFile($this->rootDirectory . '/Jenkinsfile', $stub);
     }
 }

@@ -9,7 +9,7 @@ pipeline {
     {{slack}}
     stage('announce') {
       steps {
-        slackSend channel: '#{{slackChannel}',
+        slackSend channel: '{{slackChannel}}',
                   message: "Build started: ${currentBuild.fullDisplayName} (<${env.RUN_DISPLAY_URL}|Open>)"
       }
     } // stage announce
@@ -69,22 +69,22 @@ pipeline {
   {{slack}}
   post {
     success {
-      slackSend channel: '#{{slackChannel}',
+      slackSend channel: '{{slackChannel}}',
                 color: 'good',
                 message: "${currentBuild.fullDisplayName} completed successfully after ${currentBuild.durationString}. (<${env.RUN_DISPLAY_URL}|Open>)"
     }
     failure {
-      slackSend channel: '#{{slackChannel}',
+      slackSend channel: '{{slackChannel}}',
                 color: 'danger',
                 message: "@channel ${currentBuild.fullDisplayName} failed after ${currentBuild.durationString}. (<${env.RUN_DISPLAY_URL}|Open>)"
     }
     unstable {
-      slackSend channel: '#{{slackChannel}',
+      slackSend channel: '{{slackChannel}}',
                 color: 'warning',
                 message: "${currentBuild.fullDisplayName} passed after ${currentBuild.durationString}, but is unstable. (<${env.RUN_DISPLAY_URL}|Open>)"
     }
     aborted {
-      slackSend channel: '#{{slackChannel}',
+      slackSend channel: '{{slackChannel}}',
                 message: "Build aborted: ${currentBuild.fullDisplayName} (<${env.RUN_DISPLAY_URL}|Open>)"
     }
   }

@@ -30,7 +30,7 @@ class GenerateCommand extends Command
         $this->addOption('force', null, InputOption::VALUE_NONE, 'Force Jenkinsfile generation');
         $this->addOption('build-dir', null, InputOption::VALUE_OPTIONAL, 'Build directory to use');
         $this->addOption('source-dir', null, InputOption::VALUE_OPTIONAL, 'Source directory');
-        $this->addOption('tests-dir', null, InputOption::VALUE_OPTIONAL, 'Tests directory');
+        $this->addOption('slack-channel', null, InputOption::VALUE_OPTIONAL, 'Slack channel');
     }
 
     protected function interact(InputInterface $input, OutputInterface $output)
@@ -75,11 +75,11 @@ class GenerateCommand extends Command
             $input,
             $output,
             $helper,
-            'tests-dir',
-            'Where are the tests located in your application?',
-            'tests',
+            'slack-channel',
+            'Would you like to use Slack notifications? Enter channel name, or empty for disabling',
+            '',
             function ($value) {
-                $this->jeeves->setTestsDirectory($value);
+                $this->jeeves->setSlackChannel($value);
             }
         );
     }
@@ -114,7 +114,14 @@ class GenerateCommand extends Command
         $closure($option);
     }
 
+    /**
+     * @param InputInterface  $input
+     * @param OutputInterface $output
+     *
+     * @return void
+     */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $this->jeeves->generateJenkinsFile();
     }
 }
