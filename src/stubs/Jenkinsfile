@@ -1,10 +1,6 @@
 pipeline {
   agent any
 
-  environment {
-    PATH = "vendor/bin:/var/lib/jenkins/.composer/vendor/bin:$PATH"
-  }
-
   stages {
     {{slack}}
     stage('announce') {
@@ -15,12 +11,6 @@ pipeline {
     } // stage announce
     {{/slack}}
 
-    stage('lint') {
-      steps {
-        sh 'parallel-lint -s {{sourceDirectory}}'
-      }
-    } // stage lint
-
     stage('prepare') {
       steps {
         sh 'mkdir -p {{buildDirectory}}/{logs,coverage} || true'
@@ -28,9 +18,15 @@ pipeline {
       }
     } // stage prepare
 
+    stage('lint') {
+      steps {
+        sh '{{composerPath}} parallel-lint -s {{sourceDirectory}}'
+      }
+    } // stage lint
+
     stage('test') {
       steps {
-        sh "phpunit -c phpunit.xml.dist --coverage-html {{buildDirectory}}/coverage --coverage-clover {{buildDirectory}}/logs/clover.xml --coverage-crap4j {{buildDirectory}}/logs/crap4j.xml --log-junit {{buildDirectory}}/logs/junit.xml"
+        sh "{{composerPath}} phpunit -c phpunit.xml.dist --coverage-html {{buildDirectory}}/coverage --coverage-clover {{buildDirectory}}/logs/clover.xml --coverage-crap4j {{buildDirectory}}/logs/crap4j.xml --log-junit {{buildDirectory}}/logs/junit.xml"
       }
 
       post {
@@ -45,13 +41,13 @@ pipeline {
       steps {
         parallel (
           phpmd: {
-            sh 'phpmd {{sourceDirectory}} xml {{buildDirectory}}/phpmd.xml --reportfile {{buildDirectory}}/logs/pmd.xml --suffixes php --ignore-violations-on-exit'
+            sh '{{composerPath}} phpmd {{sourceDirectory}} xml {{buildDirectory}}/phpmd.xml --reportfile {{buildDirectory}}/logs/pmd.xml --suffixes php --ignore-violations-on-exit'
           },
           phpcs: {
-            sh 'phpcs --report=checkstyle --report-file={{buildDirectory}}/logs/phpcs-checkstyle.xml --standard=phpcs.xml --extensions=php --runtime-set ignore_errors_on_exit 1 --runtime-set ignore_warnings_on_exit 1 {{sourceDirectory}}'
+            sh '{{composerPath}} phpcs --report=checkstyle --report-file={{buildDirectory}}/logs/phpcs-checkstyle.xml --standard=phpcs.xml --extensions=php --runtime-set ignore_errors_on_exit 1 --runtime-set ignore_warnings_on_exit 1 {{sourceDirectory}}'
           },
           phpcpd: {
-            sh 'phpcpd --log-pmd {{buildDirectory}}/logs/pmd-cpd.xml {{sourceDirectory}} || true'
+            sh '{{composerPath}} phpcpd --log-pmd {{buildDirectory}}/logs/pmd-cpd.xml {{sourceDirectory}} || true'
           }
         )
       }

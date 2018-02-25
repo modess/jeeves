@@ -2,19 +2,21 @@
 
 namespace Jeeves;
 
-use Symfony\Component\Filesystem\Filesystem;
+use League\Flysystem\Filesystem;
 
 class Jeeves
 {
+    const COMPOSER_PATH = 'PATH=vendor/bin:`composer config --global home`/vendor/bin:$PATH';
+
     /**
      * @var Filesystem
      */
-    private $filesystem;
+    private $fileSystem;
 
     /**
      * @var string
      */
-    private $rootDirectory;
+    private $srcDirectory;
 
     /**
      * @var string
@@ -34,12 +36,13 @@ class Jeeves
     /**
      * Jeeves constructor.
      *
-     * @param Filesystem $filesystem
+     * @param Filesystem $fileSystem
+     * @param string     $srcDirectory
      */
-    public function __construct(Filesystem $filesystem, string $rootDirectory)
+    public function __construct(Filesystem $fileSystem, string $srcDirectory)
     {
-        $this->filesystem = $filesystem;
-        $this->rootDirectory = $rootDirectory;
+        $this->fileSystem = $fileSystem;
+        $this->srcDirectory = $srcDirectory;
     }
 
     /**
@@ -47,7 +50,7 @@ class Jeeves
      */
     public function jenkinsFileExists(): bool
     {
-        return $this->filesystem->exists($this->rootDirectory . '/Jenkinsfile');
+        return $this->fileSystem->has('Jenkinsfile');
     }
 
     /**
@@ -107,7 +110,7 @@ class Jeeves
      */
     public function generateJenkinsFile()
     {
-        $stub = file_get_contents(__DIR__ . '/stubs/Jenkinsfile');
+        $stub = $this->fileSystem->read($this->srcDirectory . '/stubs/Jenkinsfile');
 
         if (empty($this->getSlackChannel())) {
             $stub = preg_replace('/(\{\{slack\}\}(.|\n)*\{\{\/slack\}\})/mU', '', $stub);
@@ -119,8 +122,9 @@ class Jeeves
 
         $stub = str_replace('{{buildDirectory}}', $this->getBuildDirectory(), $stub);
         $stub = str_replace('{{sourceDirectory}}', $this->getSourceDirectory(), $stub);
+        $stub = str_replace('{{composerPath}}', static::COMPOSER_PATH, $stub);
 
-        $this->filesystem->dumpFile($this->rootDirectory . '/Jenkinsfile', $stub);
+        $this->fileSystem->put('Jenkinsfile', $stub);
     }
 
     /**
@@ -128,7 +132,7 @@ class Jeeves
      */
     public function phpcsXmlExists(): bool
     {
-        return $this->filesystem->exists($this->rootDirectory . '/phpcs.xml');
+        return $this->fileSystem->has('phpcs.xml');
     }
 
     /**
@@ -136,9 +140,9 @@ class Jeeves
      */
     public function copyPhpcsXml()
     {
-        $this->filesystem->copy(
-            __DIR__ . '/stubs/phpcs.xml',
-            $this->rootDirectory . '/phpcs.xml'
+        $this->fileSystem->copy(
+            $this->srcDirectory . '/stubs/phpcs.xml',
+            'phpcs.xml'
         );
     }
 
@@ -147,7 +151,7 @@ class Jeeves
      */
     public function phpmdXmlExists(): bool
     {
-        return $this->filesystem->exists($this->rootDirectory . '/phpmd.xml');
+        return $this->fileSystem->has('phpmd.xml');
     }
 
     /**
@@ -155,9 +159,9 @@ class Jeeves
      */
     public function copyPhpmdXml()
     {
-        $this->filesystem->copy(
-            __DIR__ . '/stubs/phpmd.xml',
-            $this->rootDirectory . '/phpmd.xml'
+        $this->fileSystem->copy(
+            $this->srcDirectory . '/stubs/phpmd.xml',
+            'phpmd.xml'
         );
     }
 }

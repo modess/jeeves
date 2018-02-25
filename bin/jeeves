@@ -4,13 +4,18 @@
 require __DIR__.'/../vendor/autoload.php';
 
 use Symfony\Component\Console\Application;
+use League\Flysystem\Filesystem;
+use League\Flysystem\Adapter\Local;
 
 $application = new Application();
 
 $reflection = new \ReflectionClass(\Composer\Autoload\ClassLoader::class);
 $rootDirectory = dirname(dirname(dirname($reflection->getFileName())));
 
-$jeeves = new \Jeeves\Jeeves(new \Symfony\Component\Filesystem\Filesystem(), $rootDirectory);
+$rootFilesystem = new Filesystem(new Local($rootDirectory));
+$srcDirectory = $rootFilesystem->has('vendor/modess/jeeves/src/Jeeves.php') ? 'vendor/modess/jeeves' : 'src';
+
+$jeeves = new \Jeeves\Jeeves($rootFilesystem, $srcDirectory);
 
 $application->add(new \Jeeves\Commands\GenerateCommand($jeeves));
 
