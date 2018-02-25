@@ -112,13 +112,13 @@ class Jeeves
         if (empty($this->getSlackChannel())) {
             $stub = preg_replace('/(\{\{slack\}\}(.|\n)*\{\{\/slack\}\})/mU', '', $stub);
         } else {
-            $stub = preg_replace('/(\{\{slack\}\})/', '', $stub);
-            $stub = preg_replace('/(\{\{\/slack\}\})/', '', $stub);
-            $stub = preg_replace('/(\{\{slackChannel\}\})/', $this->getSlackChannel(), $stub);
+            $stub = str_replace('{{slack\}}', '', $stub);
+            $stub = str_replace('{{/slack}}', '', $stub);
+            $stub = str_replace('{{slackChannel}}', $this->getSlackChannel(), $stub);
         }
 
-        $stub = preg_replace('/(\{\{buildDirectory\}\})/', $this->getBuildDirectory(), $stub);
-        $stub = preg_replace('/(\{\{sourceDirectory\}\})/', $this->getSourceDirectory(), $stub);
+        $stub = str_replace('{{buildDirectory}}', $this->getBuildDirectory(), $stub);
+        $stub = str_replace('{{sourceDirectory}}', $this->getSourceDirectory(), $stub);
 
         $this->filesystem->dumpFile($this->rootDirectory . '/Jenkinsfile', $stub);
     }
