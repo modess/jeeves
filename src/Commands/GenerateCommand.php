@@ -122,6 +122,21 @@ class GenerateCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $output->writeln('Generating Jenkinsfile');
         $this->jeeves->generateJenkinsFile();
+
+        if ($this->jeeves->phpcsXmlExists()) {
+            $output->writeln('The file phpcs.xml exists, skipping');
+        } else {
+            $output->writeln('Copying phpcs.xml');
+            $this->jeeves->copyPhpcsXml();
+        }
+
+        if ($this->jeeves->phpmdXmlExists()) {
+            $output->writeln('The file phpmd.xml exists, skipping');
+        } else {
+            $output->writeln('Copying phpmd.xml');
+            $this->jeeves->copyPhpmdXml();
+        }
     }
 }

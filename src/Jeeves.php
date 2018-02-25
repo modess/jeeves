@@ -122,4 +122,42 @@ class Jeeves
 
         $this->filesystem->dumpFile($this->rootDirectory . '/Jenkinsfile', $stub);
     }
+
+    /**
+     * @return bool
+     */
+    public function phpcsXmlExists(): bool
+    {
+        return $this->filesystem->exists($this->rootDirectory . '/phpcs.xml');
+    }
+
+    /**
+     * Copy phpcs.xml
+     */
+    public function copyPhpcsXml()
+    {
+        $this->filesystem->copy(
+            __DIR__ . '/stubs/phpcs.xml',
+            $this->rootDirectory . '/phpcs.xml'
+        );
+    }
+
+    /**
+     * @return bool
+     */
+    public function phpmdXmlExists(): bool
+    {
+        return $this->filesystem->exists($this->rootDirectory . '/phpmd.xml');
+    }
+
+    /**
+     * Copy phpmd.xml
+     */
+    public function copyPhpmdXml()
+    {
+        $this->filesystem->copy(
+            __DIR__ . '/stubs/phpmd.xml',
+            $this->rootDirectory . '/phpmd.xml'
+        );
+    }
 }
