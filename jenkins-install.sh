@@ -102,7 +102,8 @@ sudo su - jenkins -c "composer global require \
     phpunit/phpunit \
     squizlabs/php_codesniffer \
     phpmd/phpmd \
-    sebastian/phpcpd"
+    sebastian/phpcpd \
+    jakub-onderka/php-parallel-lint"
 
 # Get initial admin password
 INITIAL_ADMIN_PASSWORD=`sudo cat /var/lib/jenkins/secrets/initialAdminPassword`
