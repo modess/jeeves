@@ -12,6 +12,9 @@
             "homepage": "https://modess.io"
         }
     ],
+    "bin": [
+        "bin/jeeves"
+    ],
     "require": {
         "php": "~7.0",
         "symfony/console": "~2.7|~3.0|~4.0",
