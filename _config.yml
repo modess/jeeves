@@ -1,0 +1,11 @@
+title: Jeeves
+email: niklas@modess.io
+description: >-
+  Continuous integration for your PHP application with Jenkins
+baseurl: ""
+url: ""
+twitter_username: niklasmodess
+github_username: modess
+
+markdown: kramdown
+theme: jekyll-theme-minimal
