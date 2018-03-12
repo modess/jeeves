@@ -43,7 +43,7 @@ class GenerateCommand extends Command
                 false
             ))) {
                 $output->writeln('Exiting');
-                return;
+                exit;
             }
         }
 
