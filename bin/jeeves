@@ -17,7 +17,7 @@ $reflection = new \ReflectionClass(\Composer\Autoload\ClassLoader::class);
 $rootDirectory = dirname(dirname(dirname($reflection->getFileName())));
 
 $rootFilesystem = new Filesystem(new Local($rootDirectory));
-$srcDirectory = $rootFilesystem->has('vendor/modess/jeeves/src/Jeeves.php') ? 'vendor/modess/jeeves' : 'src';
+$srcDirectory = $rootFilesystem->has('vendor/modess/jeeves/src/Jeeves.php') ? 'vendor/modess/jeeves/src' : 'src';
 
 $jeeves = new \Jeeves\Jeeves($rootFilesystem, $srcDirectory);
 
