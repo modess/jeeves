@@ -2,8 +2,8 @@ title: Jeeves
 email: niklas@modess.io
 description: >-
   Continuous integration for your PHP application with Jenkins
-baseurl: ""
-url: ""
+baseurl: "https://modess.io/jeeves"
+url: "https://modess.io/jeeves"
 twitter_username: niklasmodess
 github_username: modess
 
