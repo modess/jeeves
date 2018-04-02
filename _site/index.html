@@ -5,8 +5,8 @@
     <meta http-equiv="X-UA-Compatible" content="chrome=1">
 
 <!-- Begin Jekyll SEO tag v2.3.0 -->
-<title>Hello world | Jeeves</title>
-<meta property="og:title" content="Hello world" />
+<title>Introduction | Jeeves</title>
+<meta property="og:title" content="Introduction" />
 <meta property="og:locale" content="en_US" />
 <meta name="description" content="Continuous integration for your PHP application with Jenkins" />
 <meta property="og:description" content="Continuous integration for your PHP application with Jenkins" />
@@ -14,11 +14,11 @@
 <meta property="og:url" content="http://localhost:4000/" />
 <meta property="og:site_name" content="Jeeves" />
 <script type="application/ld+json">
-{"name":"Jeeves","description":"Continuous integration for your PHP application with Jenkins","author":null,"@type":"WebSite","url":"http://localhost:4000/","publisher":null,"image":null,"headline":"Hello world","dateModified":null,"datePublished":null,"sameAs":null,"mainEntityOfPage":null,"@context":"http://schema.org"}</script>
+{"name":"Jeeves","description":"Continuous integration for your PHP application with Jenkins","author":null,"@type":"WebSite","url":"http://localhost:4000/","publisher":null,"image":null,"headline":"Introduction","dateModified":null,"datePublished":null,"sameAs":null,"mainEntityOfPage":null,"@context":"http://schema.org"}</script>
 <!-- End Jekyll SEO tag -->
 
 
-    <link rel="stylesheet" href="/assets/css/style.css?v=91eb3791e19222755bd82591c253cede4c6893ee">
+    <link rel="stylesheet" href="/assets/css/style.css?v=8997da0a9b7dcb86a1e734080dd18efd1bf525a7">
     <meta name="viewport" content="width=device-width">
     <!--[if lt IE 9]>
     <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
@@ -27,7 +27,7 @@
   <body>
     <div class="wrapper">
       <header>
-        <h1>Jeeves</h1>
+        <a href="http://github.com/pages/modess/jeeves"> <h1>Jeeves</h1> </a>
         <p>Continuous integration for your PHP application with Jenkins</p>
 
         
@@ -40,7 +40,69 @@
       </header>
       <section>
 
-      <h1 id="hello-world">Hello world</h1>
+      <h1 id="introduction">Introduction</h1>
+
+<p>Settings up continuous integration with Jenkins for your PHP application has in the past been a quite daunting task. It used to consist a lot of XML configuration files and manual configuration in Jenkins web GUI. This project aims to simplify that task. It consists of two parts, a Composer package for generating the files you need in your repository, and a script for installing Jenkins and everything needed on the server.</p>
+
+<h2 id="prerequisites">Prerequisites</h2>
+
+<ul>
+  <li>Your application needs to support PHP7 (<code class="highlighter-rouge">7.0</code>, <code class="highlighter-rouge">7.1</code> or <code class="highlighter-rouge">7.2</code>).</li>
+  <li>The server/instance you’re installing Jenkins on needs to run Linux Ubuntu <code class="highlighter-rouge">14.04</code> or <code class="highlighter-rouge">16.04</code> (but might work with other versions).</li>
+  <li>The configuration guide will assume your project is hosted on Github, but it’ll work with other providers also.</li>
+</ul>
+
+<h2 id="features">Features</h2>
+
+<ul>
+  <li>Run unit tests (PHPUnit)</li>
+  <li>Fast linting in parallel (PHP parallel lint)</li>
+  <li>Code style violations (PHP Code sniffer)</li>
+  <li>Code complexity (PHP mess detector)</li>
+  <li>Duplicate code (PHP copy/paste detector)</li>
+  <li>Slack notifications, optional</li>
+</ul>
+
+<p>This will be done for all branches and pull requests.</p>
+
+<h1 id="installation">Installation</h1>
+
+<h2 id="package">Package</h2>
+
+<p>Add it to your dependencies with</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>composer require --dev modess/jeeves
+</code></pre></div></div>
+
+<p>Now run it to generate the files for your project.</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>./vendor/bin/jeeves generate
+</code></pre></div></div>
+
+<p>Commit the files to your repository and push them to your remote.</p>
+
+<h3 id="phpunit">PHPUnit</h3>
+
+<p>You need to manually add a configuration file for PHPUnit with code coverage. How that looks depends on your application, here are some examples:</p>
+
+<ul>
+  <li><a href="https://gist.github.com/modess/bbdea9e94f04c672d57c67e0ac371c01">Generic PHP application</a></li>
+  <li><a href="https://gist.github.com/modess/5bcec07bb894e0a20c4ffb85f663cdda">Laravel application</a></li>
+</ul>
+
+<p>Save it as <code class="highlighter-rouge">phpunit.xml.dist</code> in your project. If you change the <code class="highlighter-rouge">build</code> directory when generating the files for your project, update the file accordingly.</p>
+
+<h3 id="additional-packages">Additional packages</h3>
+
+<p>If you want more control over the tools and versions of them you’re running, add them to your projects’ dependencies. Otherwise they’ll be installed globally on your Jenkins server.</p>
+
+<ul>
+  <li><code class="highlighter-rouge">phpunit/phpunit</code>: Run unit tests and generate code coverage</li>
+  <li><code class="highlighter-rouge">squizlabs/php_codesniffer</code>: Checking that code styles follows a standard</li>
+  <li><code class="highlighter-rouge">phpmd/phpmd</code>: Check code complexity</li>
+  <li><code class="highlighter-rouge">sebastian/phpcpd</code>: Check for code duplication</li>
+  <li><code class="highlighter-rouge">jakub-onderka/php-parallel-lint</code>: Fast PHP linting in parallel</li>
+</ul>
 
 
       </section>
