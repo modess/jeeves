@@ -76,12 +76,18 @@ wget -q -O - https://pkg.jenkins.io/debian/jenkins-ci.org.key | sudo apt-key add
 sudo sh -c 'echo deb http://pkg.jenkins.io/debian-stable binary/ > /etc/apt/sources.list.d/jenkins.list'
 sudo LC_ALL=C.UTF-8 add-apt-repository -y ppa:ondrej/php
 
+# Add Java repository
+sudo LC_ALL=C.UTF-8 add-apt-repository ppa:webupd8team/java
+echo oracle-java8-installer shared/accepted-oracle-license-v1-1 select true | sudo /usr/bin/debconf-set-selections
+
 # Install Jenkins, PHP and general packages
 sudo apt-get update
 sudo apt-get install -y \
     git-core \
     curl \
     unzip \
+    oracle-java8-installer \
+    oracle-java8-set-default \
     jenkins \
     php${PHP_VERSION} \
     php${PHP_VERSION}-cli \
