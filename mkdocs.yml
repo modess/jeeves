@@ -1,0 +1,9 @@
+site_name: Jeeves
+theme: readthedocs
+nav:
+  - index.md
+  - setup-application.md
+  - install-jenkins.md
+  - configure-jenkins.md
+markdown_extensions:
+  - markdown.extensions.admonition
