@@ -114,6 +114,13 @@ sudo su - jenkins -c "composer global require \
 # Get initial admin password
 INITIAL_ADMIN_PASSWORD=`sudo cat /var/lib/jenkins/secrets/initialAdminPassword`
 
+# Allow anonymous read access, necessary for installing plugins from cli
+sudo sed -i 's/<denyAnonymousReadAccess>true<\/denyAnonymousReadAccess>/<denyAnonymousReadAccess>false<\/denyAnonymousReadAccess>/g' /var/lib/jenkins/config.xml
+
+# Restart Jenkins and wait for restart
+sudo service jenkins restart
+sleep 10s
+
 # Download cli tool
 sudo su - jenkins -c "wget http://localhost:8080/jnlpJars/jenkins-cli.jar -P /var/lib/jenkins"
 
@@ -135,8 +142,12 @@ sudo su - jenkins -c "java -jar jenkins-cli.jar -s http://localhost:8080 install
     greenballs \
     --username admin --password ${INITIAL_ADMIN_PASSWORD}"
 
-# Safe restart Jenkins
-sudo su - jenkins -c "java -jar jenkins-cli.jar -s http://localhost:8080 safe-restart --username admin --password ${INITIAL_ADMIN_PASSWORD}"
+# Disallow anonymous read access
+sudo sed -i 's/<denyAnonymousReadAccess>false<\/denyAnonymousReadAccess>/<denyAnonymousReadAccess>true<\/denyAnonymousReadAccess>/g' /var/lib/jenkins/config.xml
+
+# Restart Jenkins and wait for restart
+sudo service jenkins restart
+sleep 10s
 
 # Install complete
 EXTERNAL_IP=`dig +short myip.opendns.com @resolver1.opendns.com`
@@ -145,5 +156,5 @@ echo "##########################################"
 echo "# INSTALLATION COMPLETE                  #"
 echo "##########################################"
 echo "Jenkins should be available at http://${EXTERNAL_IP}:8080"
-echo "Login with admin/${INITIAL_ADMIN_PASSWORD}"
+echo "Login with: admin / ${INITIAL_ADMIN_PASSWORD}"
 exit 0
