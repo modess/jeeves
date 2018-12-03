@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  
+  <link rel="shortcut icon" href="../img/favicon.ico">
+  <title>Configure Jenkins - Jeeves</title>
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  <link rel="stylesheet" href="../css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css">
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "Configure Jenkins";
+    var mkdocs_page_input_path = "configure-jenkins.md";
+    var mkdocs_page_url = null;
+  </script>
+  
+  <script src="../js/jquery-2.1.1.min.js" defer></script>
+  <script src="../js/modernizr-2.8.3.min.js" defer></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script> 
+  
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+      <div class="wy-side-nav-search">
+        <a href=".." class="icon icon-home"> Jeeves</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+	<ul class="current">
+	  
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="..">Introduction</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../setup-application/">Setup application</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../install-jenkins/">Install Jenkins</a>
+	    </li>
+          
+            <li class="toctree-l1 current">
+		
+    <a class="current" href="./">Configure Jenkins</a>
+    <ul class="subnav">
+            
+    <li class="toctree-l2"><a href="#path-environment-variable">PATH environment variable</a></li>
+    
+
+    <li class="toctree-l2"><a href="#github-authorization">Github authorization</a></li>
+    
+        <ul>
+        
+            <li><a class="toctree-l3" href="#create-deploy-key">Create deploy key</a></li>
+        
+            <li><a class="toctree-l3" href="#add-host-key-verification">Add host key verification</a></li>
+        
+            <li><a class="toctree-l3" href="#create-access-token">Create access token</a></li>
+        
+            <li><a class="toctree-l3" href="#add-github-credentials-in-jenkins">Add Github credentials in Jenkins</a></li>
+        
+        </ul>
+    
+
+    <li class="toctree-l2"><a href="#slack-integration">Slack integration</a></li>
+    
+
+    <li class="toctree-l2"><a href="#setup-build-project">Setup build project</a></li>
+    
+
+    </ul>
+	    </li>
+          
+        </ul>
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="..">Jeeves</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="..">Docs</a> &raquo;</li>
+    
+      
+    
+    <li>Configure Jenkins</li>
+    <li class="wy-breadcrumbs-aside">
+      
+        <a href="https://github.com/modess/jeeves/edit/docs/docs/configure-jenkins.md"
+          class="icon icon-github"> Edit on GitHub</a>
+      
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              
+                <h2 id="path-environment-variable">PATH environment variable</h2>
+<p>Jenkins will need to be able to execute the different tools we install through Composer to run static analysis on your code, we need to tell it where to find these binaries.</p>
+<p>In the Jenkins web interface click "Manage Jenkins" in the left sidebar menu.</p>
+<p><img alt="" src="../img/manage-jenkins.png" /></p>
+<hr />
+<p>Then go to "Configure System".</p>
+<p><img alt="" src="../img/configure-system.png" /></p>
+<hr />
+<p>Here you'll find <em>Global Properties</em>, then click the checkbox next to <em>Environment Variables</em> and click <em>Add</em>. In <em>Name</em> you enter <code>PATH</code> and in <em>Value</em> you enter <code>$PATH:vendor/bin:/var/lib/jenkins/.composer/vendor/bin</code>. Then hit <em>Save</em>.</p>
+<p><img alt="" src="../img/path.png" /></p>
+<hr />
+<h2 id="github-authorization">Github authorization</h2>
+<h3 id="create-deploy-key">Create deploy key</h3>
+<div class="admonition note">
+<p class="admonition-title">For private repositories only</p>
+<p>This step is not necessary if you will be building a project from a public repository.</p>
+</div>
+<p>We'll generate an SSH key for the <code>jenkins</code> user on the server. So in your terminal write the following command and follow the instructions:</p>
+<pre><code>sudo su - jenkins -c &quot;ssh-keygen&quot;
+</code></pre>
+
+<p>Then output the public key and copy it for adding it on Github for your repository:</p>
+<pre><code>sudo su - jenkins -c &quot;cat ~/.ssh/id_rsa.pub&quot;
+</code></pre>
+
+<p>Then head over to Github, specifically to the <em>Deploy keys</em> settings page for your repository which can be access directly with <code>https://github.com/&lt;owner&gt;/&lt;name&gt;/settings/keys</code>.</p>
+<p>Now click <em>Add deploy key</em>.</p>
+<p><img alt="" src="../img/github-deploy-keys.png" /></p>
+<hr />
+<p>Enter a title for your key and then paste the public key in the textarea, then click <em>Add key</em>.</p>
+<p><img alt="" src="../img/github-add-deploy-key.png" /></p>
+<hr />
+<h3 id="add-host-key-verification">Add host key verification</h3>
+<p>We need to say we trust Github's domain, since Jenkins can't perform this on its own.</p>
+<pre><code>sudo su - jenkins -c &quot;ssh-keyscan -t rsa github.com &gt;&gt; ~/.ssh/known_hosts&quot;
+</code></pre>
+
+<hr />
+<h3 id="create-access-token">Create access token</h3>
+<div class="admonition note">
+<p class="admonition-title">Working in a team?</p>
+<p>If you're setting this up for the company or team you're working for, you should consider creating a "bot" user that is owned by the company or team. Then invite that user to the repository and create an access token with it. This way the access token isn't tied to your personal account.</p>
+</div>
+<p>Head over to Github, specifically to the <em>Personal access tokens</em> settings page which can be access directly with <code>https://github.com/settings/tokens</code>. There click <em>Generate new token</em>.</p>
+<p><img alt="" src="../img/github-tokens.png" /></p>
+<hr />
+<p>Enter a title for your token, then give the token access for the <em>repo</em> scope. Then click <em>Generate token</em>.</p>
+<p><img alt="" src="../img/github-new-token.png" /></p>
+<hr />
+<p>Now you'll be presented with your token. <strong>Copy this token and save it somewhere</strong>, because you won't be able to view it again. If you lose the token you have to create a new one.</p>
+<p><img alt="" src="../img/github-token.png" /></p>
+<hr />
+<h3 id="add-github-credentials-in-jenkins">Add Github credentials in Jenkins</h3>
+<p>Now you have to add this access token in Jenkins, so start by going do your dashboard and click <em>Credentials</em>.</p>
+<p><img alt="" src="../img/credentials-dashboard.png" /></p>
+<hr />
+<p>Continue on by clicking <em>(global)</em>.</p>
+<p><img alt="" src="../img/credentials-global.png" /></p>
+<hr />
+<p>Now go to <em>Add Credentials</em>.</p>
+<p><img alt="" src="../img/credentials-add.png" /></p>
+<hr />
+<p>Everything should now be preset, but make sure all dropdowns match the ones on this image and enter the Github username in <em>Username</em>, and add the <strong>access token</strong> as <em>Password</em>. Then click <em>OK</em>.</p>
+<p><img alt="" src="../img/credentials-create.png" /></p>
+<hr />
+<h2 id="slack-integration">Slack integration</h2>
+<p>If you chose a Slack channel to send notifications to when generating files for your application, you need to set up the integration for it.</p>
+<p>Start by setting up an integration for your Slack channel by visiting <code>https://&lt;your-slack-subdomain&gt;.slack.com/apps</code>. Here you search for <em>jenkins</em> and click the <em>Jenkins CI</em> integration.</p>
+<p><img alt="" src="../img/slack-applications.png" /></p>
+<hr />
+<p>Continue by clicking <em>Install</em>.</p>
+<p><img alt="" src="../img/slack-install.png" /></p>
+<hr />
+<p>Chose which channel to post notifications to, even though your application configuration will override this setting. Then click <em>Add Jenkins CI integration</em></p>
+<p><img alt="" src="../img/slack-channel.png" /></p>
+<hr />
+<p>Now you'll be presented with the installation instructions for the integration. Scrolling down to <em>Step 3</em> you'll find your <em>Base URL</em> and <em>Integration Token</em>. Copy these or leave the page up for later reference.</p>
+<p><img alt="" src="../img/slack-token.png" /></p>
+<hr />
+<h2 id="setup-build-project">Setup build project</h2>
+<p>Now it's only a matter of creating a build project in Jenkins to start using CI! Head to the Jenkins dashboard and click <em>New Item</em>.</p>
+<p><img alt="" src="../img/project-dashboard.png" /></p>
+<hr />
+<p>Give your build project a title and select <em>Multibranch Pipeline</em> as the type for it and continue by clicking <em>OK</em>.</p>
+<p><img alt="" src="../img/project-init.png" /></p>
+<hr />
+<p>Now under <em>Branch Sources</em>, click <em>Add source</em> and select <em>Git</em>.</p>
+<p><img alt="" src="../img/project-branch-sources.png" /></p>
+<hr />
+<p>Add your repository in the format <code>git@github.com:&lt;owner&gt;/&lt;name&gt;.git</code>.</p>
+<p><img alt="" src="../img/project-repository.png" /></p>
+<hr />
+<p>Now add the credentials you've previously created by using the dropdown and selecting it.</p>
+<p><img alt="" src="../img/project-credentials.png" /></p>
+<hr />
+<p>Now hit <em>Save</em> and you're done. Jenkins will now build all your branches and your pull requests!</p>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+      
+        <a href="../install-jenkins/" class="btn btn-neutral" title="Install Jenkins"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="http://www.mkdocs.org">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+      
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" style="cursor: pointer">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      
+          <a href="https://github.com/modess/jeeves/" class="fa fa-github" style="float: left; color: #fcfcfc"> GitHub</a>
+      
+      
+        <span><a href="../install-jenkins/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      
+      
+    </span>
+</div>
+    <script>var base_url = '..';</script>
+    <script src="../js/theme.js" defer></script>
+      <script src="../search/main.js" defer></script>
+
+</body>
+</html>
