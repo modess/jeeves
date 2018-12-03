@@ -8,4 +8,4 @@ nav:
 markdown_extensions:
   - markdown.extensions.admonition
 repo_url: https://github.com/modess/jeeves/
-edit_uri: edit/gh-pages/docs/
+edit_uri: edit/docs/docs/
